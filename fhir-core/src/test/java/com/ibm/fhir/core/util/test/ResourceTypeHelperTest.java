@@ -20,41 +20,17 @@ import com.ibm.fhir.core.util.ResourceTypeHelper;
  */
 public class ResourceTypeHelperTest {
     @Test
-    public void testGetNewOrBreakingResourceTypeNames() {
-        Set<String> newOrBreakingResourceTypeNames = ResourceTypeHelper.getNewOrBreakingResourceTypeNames();
-        assertEquals(newOrBreakingResourceTypeNames.size(), 16, "number of new or breaking resource types");
-    }
-
-    @Test(expectedExceptions = UnsupportedOperationException.class)
-    public void testGetNewOrBreakingResourceTypeNamesInvalidAddTo() {
-        Set<String> newOrBreakingResourceTypeNames = ResourceTypeHelper.getNewOrBreakingResourceTypeNames();
-        newOrBreakingResourceTypeNames.add("test");
-    }
-
-    @Test(expectedExceptions = UnsupportedOperationException.class)
-    public void testGetNewOrBreakingResourceTypeNamesInvalidRemove() {
-        Set<String> newOrBreakingResourceTypeNames = ResourceTypeHelper.getNewOrBreakingResourceTypeNames();
-        newOrBreakingResourceTypeNames.remove("Ingredient");
-    }
-
-    @Test
     public void testGetResourceTypesFor() {
-        Set<String> r4Types = ResourceTypeHelper.getResourceTypesFor(FHIRVersionParam.VERSION_40);
-        assertEquals(r4Types.size(), 125, "number of r4 resource types");
+        Set<String> r4Types = ResourceTypeHelper.getCompatibleResourceTypes(FHIRVersionParam.VERSION_40, FHIRVersionParam.VERSION_40);
+        assertEquals(r4Types.size(), 146, "number of r4 resource types");
 
-        Set<String> r4bTypes = ResourceTypeHelper.getResourceTypesFor(FHIRVersionParam.VERSION_43);
+        Set<String> r4bTypes = ResourceTypeHelper.getCompatibleResourceTypes(FHIRVersionParam.VERSION_43, FHIRVersionParam.VERSION_43);
         assertEquals(r4bTypes.size(), 141, "number of r4b resource types");
-    }
 
-    @Test(expectedExceptions = UnsupportedOperationException.class)
-    public void testInvalidAdd() {
-        Set<String> newOrBreakingResourceTypeNames = ResourceTypeHelper.getResourceTypesFor(FHIRVersionParam.VERSION_40);
-        newOrBreakingResourceTypeNames.add("test");
-    }
+        Set<String> backwardCompatibleTypes = ResourceTypeHelper.getCompatibleResourceTypes(FHIRVersionParam.VERSION_40, FHIRVersionParam.VERSION_43);
+        assertEquals(backwardCompatibleTypes.size(), 125, "number of r4b resource types that are backwards-scompatible with r4");
 
-    @Test(expectedExceptions = UnsupportedOperationException.class)
-    public void testInvalidRemove() {
-        Set<String> newOrBreakingResourceTypeNames = ResourceTypeHelper.getResourceTypesFor(FHIRVersionParam.VERSION_43);
-        newOrBreakingResourceTypeNames.remove("Ingredient");
+        Set<String> forwardCompatibleTypes = ResourceTypeHelper.getCompatibleResourceTypes(FHIRVersionParam.VERSION_43, FHIRVersionParam.VERSION_40);
+        assertEquals(forwardCompatibleTypes.size(), 123, "number of r4 resource types that are forwards-compatible with r4b");
     }
 }
